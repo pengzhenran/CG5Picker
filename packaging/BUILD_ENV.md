@@ -109,7 +109,7 @@ D:\CG5Picker_test_install\unins000.exe /VERYSILENT   # 卸载干净
 
 * **许可页**（`LICENSE.txt` = MIT 全文，必须同意才能继续）；
 * **安装前信息页**（`licenses\NOTICE.txt` = 第三方组件与 LGPLv3 声明）；
-* 开始菜单：`CG5 数据挑选` / `使用说明 (HTML)` / `作者信息` / `许可与第三方声明` / `卸载`；
+* 开始菜单：`CG5 数据挑选` / `使用说明 (HTML)` / `作者信息（关于）` / `许可与第三方声明` / `卸载`；
 * 可选桌面快捷方式；
 * `source\` 里随包附运行代码（`pickersrc\`）+ README + LICENSE + licenses + docs + packaging。
 

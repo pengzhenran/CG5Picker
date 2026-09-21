@@ -116,9 +116,16 @@ Source: "{#ProjDir}\resources\*";  DestDir: "{app}\source\resources"; Flags: ign
 Source: "{#ProjDir}\packaging\*";  DestDir: "{app}\source\packaging"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "__pycache__\*,*.pyc"
 
 [Icons]
+; ★ 快捷方式名字里**不能出现 Windows 文件名非法字符**： \ / : * ? " < > |
+;   原来是「作者信息 / 关于」，那个 `/` 被当成路径分隔符 → Inno 去存
+;   `...\CG5Picker\作者信息 \关于.lnk`，目录不存在 →
+;   「IPersistFile::Save 失败；错误代码 0x80070003 系统找不到指定的路径」，
+;   而且静默安装还会以退出码 0 收场（错误被 SUPPRESSMSGBOXES 吞掉），
+;   同时在那个文件夹里留下一个叫「作者信息 」的垃圾目录（v1.0.0 实测）。
+;   现在用中文括号，全套安全性由 _selfcheck\verify_all.py 的 [13] 组钉住。
 Name: "{group}\{#MyAppName} {#MyAppNameCN}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{group}\使用说明 (HTML)"; Filename: "{app}\_internal\docs\使用说明.html"
-Name: "{group}\作者信息 / 关于"; Filename: "{app}\{#MyAppExeName}"; Parameters: "--version"
+Name: "{group}\作者信息（关于）"; Filename: "{app}\{#MyAppExeName}"; Parameters: "--about"
 Name: "{group}\许可与第三方声明"; Filename: "{app}\_internal\licenses\NOTICE.txt"
 Name: "{group}\卸载 {#MyAppName}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
@@ -128,6 +135,11 @@ Filename: "{app}\{#MyAppExeName}"; Description: "启动 {#MyAppName} {#MyAppName
 Filename: "{app}\_internal\docs\使用说明.html"; Description: "打开使用说明"; Flags: shellexec nowait postinstall skipifsilent unchecked
 
 [UninstallDelete]
-; 只清掉可能残留的缓存；**config\ 里的参数设置与条件组合会随卸载一起删除**
-; （它们就在安装目录下 —— 想保留请卸载前把 config\ 备份出去）
+; 程序自己的缓存 + **运行期才出现的 config\**。
+;   ★ config\ 是程序自己建的（不随安装包），不显式删的话卸载后
+;     安装目录会留下一个只有 config\ 的空壳（实测踩过：卸载完
+;     %LOCALAPPDATA%\Programs\CG5Picker 还在，用户看着像没卸干净）。
+;   删掉它之后 {app} 就空了，Inno 会把安装目录一并收走。
+;   想保留参数设置/条件组合 → 卸载前把 config\ 备份出去。
 Type: filesandordirs; Name: "{app}\_internal\__pycache__"
+Type: filesandordirs; Name: "{app}\config"

@@ -33,7 +33,7 @@
 下载 `CG5Picker_Setup_v1.0.0.exe` 双击按向导安装：
 
 - 默认**按用户安装**（不弹管理员）到 `%LOCALAPPDATA%\Programs\CG5Picker`，向导里也能改到别的盘；
-- 开始菜单生成 `CG5 数据挑选` / `使用说明 (HTML)` / `作者信息` / `许可与第三方声明` / `卸载`，可选桌面快捷方式；
+- 开始菜单生成 `CG5 数据挑选` / `使用说明 (HTML)` / `作者信息（关于）` / `许可与第三方声明` / `卸载`，可选桌面快捷方式；
 - **不需要装 Python**：Python 运行时、Qt、绘图库都在安装目录里；全程离线；
 - 安装目录**可写**，所以窗口、条件栈的记忆（`config\settings.json`）存得下来；
 - 装完双击图标即用，界面里 **F1 = 使用说明**、**Shift+F1 = 关于**。
@@ -662,7 +662,7 @@ CG5Picker/
 │   ├── window.py               界面组织
 │   └── selftest.py             无界面自检
 ├── packaging/                  ★ 打包（PyInstaller + Inno Setup，见 BUILD_ENV.md）
-│   ├── cg5picker_launcher.py   打包入口（先 import pickersrc 再调用；--version/--guide/--licenses）
+│   ├── cg5picker_launcher.py   打包入口（先 import pickersrc 再调用；--about/--guide/--version/--licenses）
 │   ├── cg5picker.spec          PyInstaller 配置（onedir、排除 GPL-only Qt 模块、打进 docs/licenses）
 │   ├── make_version_info.py    生成 exe 版本资源（版本/版权/公司/联系方式，取自 appinfo）
 │   ├── version_info.txt        上面脚本生成的产物（别手改，**不入库**）
@@ -696,7 +696,7 @@ PySide6-Essentials / matplotlib / numpy / openpyxl / pyinstaller，**没有 pand
 
 安装包按用户装到 `%LOCALAPPDATA%\Programs\CG5Picker`（不弹管理员、目录可写，
 所以 `config\` 存得下来），向导里**带许可页（MIT 全文）与第三方组件声明页**（中文向导），
-开始菜单有 `CG5 数据挑选 / 使用说明 (HTML) / 作者信息 / 许可与第三方声明 / 卸载`。
+开始菜单有 `CG5 数据挑选 / 使用说明 (HTML) / 作者信息（关于） / 许可与第三方声明 / 卸载`。
 **实测**：静默装 → 跑起来 `IsZoomed=True`（默认最大化）→ 卸载干净。
 细节与踩坑见 `packaging/BUILD_ENV.md`（绝不用 onefile、入口必须用 launcher、
 `docs\`+`licenses\` 必须随包、`.ps1` 要带 BOM、冻结版 stdout 要 UTF-8、

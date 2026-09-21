@@ -30,6 +30,24 @@ XLSX = ROOT / "CG5Picker" / "_selfcheck" / "原始格式.xlsx"
 
 _fails: list[str] = []
 
+# 真安装目录的 config/ 快照（main() 里填）—— 用来证明自检没往那儿写东西
+_REAL_CFG: dict = {"path": None, "snap": {}}
+
+
+def _snapshot_dir(d) -> dict:
+    """目录快照：相对路径 → (mtime, size)。用来证明某段代码什么都没往里写。"""
+    out: dict = {}
+    if d is None or not Path(d).is_dir():
+        return out
+    root = Path(d)
+    for p in sorted(root.rglob("*")):
+        try:
+            st = p.stat()
+        except OSError:
+            continue
+        out[str(p.relative_to(root))] = (st.st_mtime, st.st_size)
+    return out
+
 
 def check(label: str, cond: bool, detail: str = "") -> bool:
     print(f"  [{'OK' if cond else 'FAIL'}] {label}" + (f"　{detail}" if detail else ""))
@@ -2532,10 +2550,17 @@ def test_settings_and_about(app, tmp) -> None:
             os.environ["CG5PICKER_CONFIG_DIR"] = _env_saved
         appinfo.reset_config_cache()
     # ★ 自检**一个字都不该往真安装目录写**（踩过：离屏窗口的 maximized=false
-    #   被写进发行包，用户一打开就不最大化）
-    check("自检没有在安装目录建出 config/（不污染真配置）",
-          not (appinfo._app_dir() / appinfo.CONFIG_DIRNAME).exists(),
-          str(appinfo._app_dir() / appinfo.CONFIG_DIRNAME))
+    #   被写进发行包，用户一打开就不最大化）。
+    #   判据是"快照没变"，不是"目录不存在" —— 开发机上从源码跑过界面，
+    #   安装目录 = 项目目录，config/ 本来就该在。
+    _cfg_now = _snapshot_dir(_REAL_CFG["path"])
+    _changed = sorted(set(_cfg_now) ^ set(_REAL_CFG["snap"])) + sorted(
+        k for k in set(_cfg_now) & set(_REAL_CFG["snap"])
+        if _cfg_now[k] != _REAL_CFG["snap"][k])
+    check("自检没有往真安装目录的 config/ 写任何东西（不污染真配置）",
+          _cfg_now == _REAL_CFG["snap"],
+          f"{_REAL_CFG['path']}（自检前 {len(_REAL_CFG['snap'])} 个文件；"
+          f"变了的：{_changed or '无'}）")
     # ★ 环境变量能把配置目录挪走（自检 / 打包冒烟靠它，免得把
     #   "离屏窗口不满意最大化"的状态写进真安装目录 —— 实测踩过）
     _env_now = os.environ.get("CG5PICKER_CONFIG_DIR")
@@ -2722,6 +2747,55 @@ def test_settings_and_about(app, tmp) -> None:
           "使用说明" in w2.btn_guide.text() and "关于" in w2.btn_about.text())
     w2.close()
 
+    # ---- ⑧ 打包卫生：安装包快捷方式的名字必须是**合法文件名** ----
+    #   ★ 真踩过（v1.0.0 发出去之后用户报的错）：.iss 里写「作者信息 / 关于」，
+    #     那个 `/` 被 Windows 当成路径分隔符 → Inno 去存
+    #     `...\CG5Picker\作者信息 \关于.lnk`，目录不存在 →
+    #     「IPersistFile::Save 失败；错误代码 0x80070003 系统找不到指定的路径」，
+    #     还在开始菜单里留一个叫「作者信息 」的垃圾目录。
+    #     更坑的是**静默安装会以退出码 0 收场**（错误被 /SUPPRESSMSGBOXES 吞掉），
+    #     所以"静默装一遍 + 看退出码"根本发现不了，这里直接读 .iss 把名字钉死。
+    _proj = Path(__file__).resolve().parents[1]
+    _iss = _proj / "packaging" / "installer_cg5picker.iss"
+    check("安装脚本在（packaging\\installer_cg5picker.iss）", _iss.is_file(), str(_iss))
+    _iss_txt = _iss.read_text(encoding="utf-8", errors="replace")
+    _icons: list[str] = []
+    _in_icons = False
+    for _line in _iss_txt.splitlines():
+        _s = _line.strip()
+        if _s.startswith("["):
+            _in_icons = _s.lower() == "[icons]"
+            continue
+        if _in_icons and _s.lower().startswith("name:"):
+            _m = re.match(r'name:\s*"(.*?)"', _s, re.IGNORECASE)
+            if _m:
+                _icons.append(_m.group(1))
+    check("安装脚本里有 5 个以上的开始菜单/桌面快捷方式",
+          len(_icons) >= 5, f"{len(_icons)} 个：{_icons}")
+    _ILLEGAL = '\\/:*?"<>|'
+    _bad: list[str] = []
+    for _name in _icons:
+        _leaf = _name.split("\\")[-1]        # 最后一段才是真正的文件名
+        _hit = [c for c in _ILLEGAL if c in _leaf]
+        if _hit:
+            _bad.append(f"{_name}（文件名里有 {' '.join(_hit)}）")
+        elif _leaf != _leaf.strip(" ."):
+            _bad.append(f"{_name}（文件名以空格/点结尾，Windows 会吃掉）")
+    check('快捷方式名字里没有 Windows 非法文件名字符（\\ / : * ? " < > |）',
+          not _bad, "；".join(_bad))
+    check("「作者信息（关于）」快捷方式指向 --about（开窗口，"
+          "不是打印到用户看不见的控制台）",
+          any(n.endswith("作者信息（关于）") for n in _icons)
+          and re.search(r'作者信息（关于）"[^\r\n]*Parameters:\s*"--about"',
+                        _iss_txt) is not None,
+          "见 [Icons] 段")
+    _lch = (_proj / "packaging" / "cg5picker_launcher.py").read_text(
+        encoding="utf-8", errors="replace")
+    check("入口脚本里真有 --about 分支", '"--about"' in _lch and "_open_about" in _lch)
+    check("入口脚本判了「有没有控制台」：无控制台时打印类子命令改开窗口"
+          "（否则双击快捷方式什么都没发生）",
+          "_stdout_is_real" in _lch and "can_print" in _lch)
+
 
 def main() -> int:
     from PySide6.QtWidgets import QApplication
@@ -2736,6 +2810,14 @@ def main() -> int:
     #   window/geometry 与 maximized=false 写进去 —— 那会把**真程序**的启动状态
     #   搞坏（实测踩过：自检跑过一轮后，源码版与打包版打开都不最大化了）。
     os.environ["CG5PICKER_CONFIG_DIR"] = str(_tmp_root / "config")
+
+    # ★ 真安装目录 config/ 的**快照**：自检跑完要证明里面一个字都没被动过。
+    #   注意不能只判"这个目录不存在" —— 开发机上从源码跑过界面，
+    #   安装目录就是项目目录，config/ 本来就在（那条断言曾经因此误报）。
+    from pickersrc import appinfo as _ai
+
+    _REAL_CFG["path"] = _ai._app_dir() / _ai.CONFIG_DIRNAME
+    _REAL_CFG["snap"] = _snapshot_dir(_REAL_CFG["path"])
 
     from pickersrc.plots import ensure_cjk_font
     from pickersrc.window import _create_app
