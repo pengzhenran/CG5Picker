@@ -22,7 +22,7 @@
 > **不写代码也能用**：Windows 安装包 `CG5Picker_Setup_v1.0.0.exe`（44.9 MB，装完即用，**不需要 Python**）
 >
 > - [GitHub Releases](https://github.com/pengzhenran/CG5Picker/releases/latest)（海外）
-> - **夸克网盘**（国内更快）：<https://pan.quark.cn/s/615510f3f836>
+> - **夸克网盘**（国内更快）：<https://pan.quark.cn/s/9d91518520e6>
 >
 > 课题组公众号与网盘二维码见文末「**关注与获取**」。
 
@@ -782,7 +782,7 @@ PySide6-Essentials / matplotlib / numpy / openpyxl / pyinstaller，**没有 pand
 | <img src="docs/qr-tvgg.jpg" width="200" alt="课题组公众号二维码"> | <img src="docs/qr-quark.png" width="200" alt="夸克网盘二维码"> |
 | 扫码关注，获取工具与更新 | 扫码打开网盘分享（`CG5Picker_Setup_v1.0.0.exe`） |
 
-夸克网盘链接：<https://pan.quark.cn/s/615510f3f836>　·　安装包也可以直接从
+夸克网盘链接：<https://pan.quark.cn/s/9d91518520e6>　·　安装包也可以直接从
 [Releases](https://github.com/pengzhenran/CG5Picker/releases/latest) 下载。
 
 ## 致谢
