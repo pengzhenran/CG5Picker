@@ -1,0 +1,14 @@
+# CG5Picker —— 运行依赖（源码直接运行 / 自己装环境时用）
+#
+# 终端用户装安装包即可，**不需要**这份文件（安装包里已经带好全部依赖）。
+#
+# 界面只装 **PySide6-Essentials**：完整版 PySide6 会带上 PySide6-Addons
+# （Qt Charts / Data Visualization / Graphs —— GPL-only），闭源分发不能用
+# （见 licenses/NOTICE.txt 与 packaging/check_licensing.py）。
+#
+# 打包用的环境另见 packaging/requirements-build.txt（在它基础上多一个 pyinstaller）。
+
+PySide6-Essentials>=6.5      # 界面（LGPLv3，动态链接、未修改）
+matplotlib>=3.7              # 全部绘图（PSF/BSD 风格）
+numpy>=1.24                  # 数值（读数统计、极差、理论固体潮）
+openpyxl>=3.1                # 导出 xlsx（MIT）

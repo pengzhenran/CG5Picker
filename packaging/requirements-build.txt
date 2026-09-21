@@ -1,0 +1,26 @@
+# CG5Picker —— 打包环境依赖（**极简**，与 SHKit / SHSynth 的打包环境同一套路）
+#
+#   uv venv --python 3.12 D:\CG5Picker_build\venv
+#   uv pip install --python D:\CG5Picker_build\venv\Scripts\python.exe `
+#       -r packaging\requirements-build.txt
+#
+# 只列**运行真的会用到的**：
+#   · PySide6-Essentials —— 只装 Essentials，**不要装完整 PySide6**：
+#     完整包会带上 PySide6-Addons（Qt Charts / Data Visualization / Graphs 等
+#     GPL-only 模块），闭源分发的红线（见 licenses/NOTICE.txt 与 check_licensing.py）；
+#   · numpy / matplotlib / openpyxl —— 数值、绘图、xlsx；
+#   · pyinstaller —— 打包工具本身**不随发行包分发**（其特殊例外允许分发非自由程序）。
+#
+# 刻意**不装**：
+#   · pandas / scipy —— matplotlib 的 PyInstaller 钩子会去找它们，但本工具不用；
+#     装进来会让目录包多出 ~90 MB（spec 里也显式 excludes 了）；
+#   · pytest / ipython / jupyter / sphinx 之类开发工具；
+#   · conda / MKL 版 numpy —— 那会把目录包从 ~170 MB 撑到 1 GB 级。
+#
+# 版本按"这台机器上实测通过"钉住（见 packaging/BUILD_ENV.md）。
+
+PySide6-Essentials==6.11.2
+matplotlib==3.11.2
+numpy==2.5.3
+openpyxl==3.1.5
+pyinstaller==6.22.3

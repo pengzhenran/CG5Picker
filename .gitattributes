@@ -1,0 +1,11 @@
+# 仓库里一律用 LF 存文本，二进制按原样 —— 为的是不让别人的 core.autocrlf
+# 把 .bat / .ps1 的行尾改掉（本项目所有脚本都是 LF，.ps1 还带 UTF-8 BOM）。
+* text=auto eol=lf
+
+*.ico  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.xlsx binary
+*.docx binary
+*.exe  binary

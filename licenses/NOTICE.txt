@@ -1,0 +1,89 @@
+CG5Picker（CG5 数据挑选）— 第三方组件与许可声明 / Third-Party Notices
+=====================================================================
+
+本软件（CG5Picker，CG5 数据挑选）自身代码采用 **MIT** 许可，
+全文见 ../LICENSE.txt，版权行为：
+    Copyright (c) 2026 彭桢燃 (Zhenran Peng) <zhenran.peng@cug.edu.cn>
+
+下面逐条列出随发行包一起分发的第三方组件及其许可与义务。
+(The application's own code is MIT-licensed; see ../LICENSE.txt.)
+
+-------------------------------------------------------------------
+1. Qt for Python（PySide6 / Qt）— GNU Lesser General Public License v3
+-------------------------------------------------------------------
+本软件的图形界面使用 Qt for Python（PySide6），依据 GNU Lesser General
+Public License version 3 条款使用，**以动态链接方式**调用（Qt 的 DLL 与
+Python 扩展原样随包分发，未做过任何修改）。
+
+  This application uses Qt for Python (PySide6) under the terms of the GNU
+  Lesser General Public License, version 3. It is used as an unmodified,
+  dynamically linked library.
+
+本软件只用到 LGPLv3 覆盖的模块：QtCore / QtGui / QtWidgets。
+**刻意不使用** Qt Charts / Qt Data Visualization / Qt Graphs /
+Qt Virtual Keyboard —— 它们是 GPL-only 模块，会让闭源分发变成不可能；
+所有绘图一律用 matplotlib（见第 2 条）。
+
+完整许可文本：
+    licenses/LGPL-3.0.txt   （LGPLv3 以引用方式并入 GPLv3，
+    licenses/GPL-3.0.txt     故同时提供 GPLv3 全文）
+
+对应源码（LGPLv3 要求能取到库的源码）：
+    pip download PySide6==6.11.2 --no-binary :all:
+    https://pypi.org/project/PySide6/
+    https://code.qt.io/cgit/pyside/pyside-setup.git/
+    https://download.qt.io/official_releases/QtForPython/
+
+用户替换权：本软件不阻止、也不限制你用自己的（兼容）PySide6 / Qt 运行库
+替换随包的这一份 —— 直接替换程序目录下的 Qt DLL 与 PySide6 扩展即可。
+
+Qt 及相关商标归 The Qt Company Ltd. 所有。
+Qt and the Qt logo are trademarks of The Qt Company Ltd.
+
+-------------------------------------------------------------------
+2. matplotlib — Matplotlib License（PSF 风格，BSD 兼容）
+-------------------------------------------------------------------
+全部绘图（读数 vs 时间 / 互差带 / 倾斜温度 / 仪器潮汐 vs 理论潮汐）使用
+matplotlib 3.11.2。其许可基于 PSF 许可，兼容 BSD，允许闭源分发。
+matplotlib 自带的 DejaVu 字体按其免费字体许可分发。
+界面中文依赖**系统字体**（Microsoft YaHei / 微软雅黑 等），
+**不随包分发任何字体文件**，因此不涉及字体再分发许可问题。
+
+-------------------------------------------------------------------
+3. NumPy — BSD 3-Clause
+-------------------------------------------------------------------
+数值计算（读数统计、极差、理论固体潮）使用 NumPy 2.5.3，BSD 3-Clause 许可。
+
+-------------------------------------------------------------------
+4. openpyxl — MIT
+-------------------------------------------------------------------
+导出 xlsx 使用 openpyxl 3.1.5，MIT 许可。
+
+-------------------------------------------------------------------
+5. Python 运行时 — PSF License
+-------------------------------------------------------------------
+随包分发的 Python 解释器与标准库（CPython 3.12）采用 PSF License。
+
+-------------------------------------------------------------------
+6. PyInstaller（仅打包时使用）— GPL-2.0-or-later + 特殊例外
+-------------------------------------------------------------------
+打包工具 PyInstaller 带明确的特殊例外，允许用它编译、链接并分发**非自由
+程序**；PyInstaller 自身不随发行包分发。
+    https://pyinstaller.org/en/stable/license.html
+
+-------------------------------------------------------------------
+7. 随包内容
+-------------------------------------------------------------------
+* 公众号二维码图片（地球重力与人类生活 TVGG）：作者自制，随本软件分发。
+* 程序图标（cg5picker.ico / .png）：作者自制（resources/make_icon.py 生成）。
+* 使用说明（docs/使用说明.html）与其配图：作者自制，界面截图取自本软件。
+* 本软件不使用任何地图数据、外部数据集或第三方文本资源。
+
+-------------------------------------------------------------------
+合规小结（LGPLv3 的五条义务）
+-------------------------------------------------------------------
+1. 告知用户使用了 LGPLv3 组件            → 本文件 + 界面「关于」+ 使用说明；
+2. 随附 LGPLv3 全文（并附 GPLv3）        → licenses/LGPL-3.0.txt、GPL-3.0.txt；
+3. 以动态链接方式使用，未修改库           → 见第 1 条；
+4. 允许用户替换库（可重新链接）           → 见第 1 条「用户替换权」；
+5. 提供对应源码的获取途径                → 见第 1 条源码地址。

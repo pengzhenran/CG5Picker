@@ -1,0 +1,23 @@
+# ---- 本地配置：跟着安装目录走，属于"用户现场"，不入库 ----
+config/
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# ---- 打包产物（PyInstaller / Inno 的输出与生成的版本资源）----
+build/
+dist/
+packaging/version_info.txt
+
+# ---- 自检/截图产物 ----
+_selfcheck/*.png
+_selfcheck/*.json
+
+# ---- 野外实测手簿与导出结果：不进公开仓库 ----
+1465_20250702.txt
+914_*.txt
+*.xlsx
